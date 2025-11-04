@@ -18,7 +18,7 @@ fi
 
 
 echo "[INFO] step 1/3: change ownership to ${CONTAINER_USER}"
-bash "${CONTAINER_WORK_DIR}/.devcontainer/sh-utils/change_owner.sh" "${CONTAINER_USER}" \
+bash "${CONTAINER_WORK_DIR}/.devcontainer/sjsh/change_owner.sh" "${CONTAINER_USER}" \
     --target "${CONTAINER_HOME}" \
     --target "${CONTAINER_WORK_DIR}:${CONTAINER_WORK_DIR}/.datasets" \
     --target "${CONTAINER_WORK_DIR}/.datasets:${CONTAINER_WORK_DIR}/.datasets/pills:${CONTAINER_WORK_DIR}/.datasets/ILSVRC:${CONTAINER_WORK_DIR}/.datasets/asr-rankformer-datasets"
@@ -27,5 +27,5 @@ echo "[INFO] step 2/3: sync uv"
 cd "${CONTAINER_WORK_DIR}" && uv sync
 
 echo "[INFO] step 3/3: setup lhotse"
-bash "${CONTAINER_WORK_DIR}/.devcontainer/sh-utils/LIA/setup_lhotse.sh" "${CONTAINER_WORK_DIR}"
+bash "${CONTAINER_WORK_DIR}/.devcontainer/sjsh/LIA/setup_lhotse.sh" "${CONTAINER_WORK_DIR}"
 
