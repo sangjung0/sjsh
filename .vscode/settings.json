@@ -28,5 +28,7 @@
         "editor.insertSpaces": true,
         "files.trimTrailingWhitespace": false,
     },
-    "cSpell.words": []
+    "cSpell.words": [
+        "venv"
+    ]
 }
