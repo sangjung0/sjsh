@@ -1,3 +1,6 @@
+# Author: SangJeong Kim
+# Last Modified: 2026-03-30
+
 root = true
 
 [*]
@@ -13,3 +16,55 @@ max_line_length = 88
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.puml]
+indent_size = 2
+
+# --- YAML ---
+[*.yml]
+indent_size = 2
+
+[*.yaml]
+indent_size = 2
+
+# --- Dockerfile / docker-compose ---
+[Dockerfile]
+indent_size = 2
+
+[dockerfile]
+indent_size = 2
+
+[docker-compose.yml]
+indent_size = 2
+
+[docker-compose.yaml]
+indent_size = 2
+
+# --- Shell script (.sh) ---
+[*.sh]
+indent_style = space
+indent_size = 2
+
+# --- dotenv / .env ---
+[.env]
+indent_style = space
+indent_size = 0
+
+[.env.*]
+indent_style = space
+indent_size = 0
+
+# --- pyproject.toml, 기타 TOML ---
+[*.toml]
+indent_size = 4
+
+# --- Makefile (탭 강제) ---
+[Makefile]
+indent_style = tab
+
+# --- JSON / JSONC (VSCode 설정, etc.) ---
+[*.json]
+indent_size = 2
+
+[*.jsonc]
+indent_size = 2

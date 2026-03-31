@@ -1,34 +1,44 @@
+// Author: SangJeong Kim
+// Last Modified: 2026-03-31
+
 {
-    "editor.wordWrap": "on",
-    "editor.wrappingIndent": "indent",
-    "search.exclude": {
-        "**/.git": true,
-        "**/.vscode": true,
-    },
-    "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-    },
-    // Editor
-    "editor.fontFamily": "JetBrains Mono, D2Coding",
-    "editor.fontLigatures": true,
-    "editor.fontSize": 18,
-    "editor.letterSpacing": 0,
-    "editor.detectIndentation": false,
-    "editor.trimAutoWhitespace": true,
-    "terminal.integrated.fontFamily": "JetBrains Mono, D2Coding",
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-    "files.eol": "\n",
-    // Formatter
-    "editor.formatOnSave": true,
-    "[markdown]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.tabSize": 4,
-        "editor.insertSpaces": true,
-        "files.trimTrailingWhitespace": false,
-    },
-    "cSpell.words": [
-        "venv"
-    ]
+  "editor.wordWrap": "on",
+  "editor.wrappingIndent": "indent",
+  "search.exclude": {
+    "**/.git": true,
+    "**/.vscode": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  // Editor
+  "editor.fontFamily": "JetBrains Mono, D2Coding",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 18,
+  "editor.letterSpacing": 0,
+  "editor.detectIndentation": false,
+  "editor.trimAutoWhitespace": true,
+  "terminal.integrated.fontFamily": "JetBrains Mono, D2Coding",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+  // Formatter
+  "editor.formatOnSave": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": false
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": ["venv"]
 }
