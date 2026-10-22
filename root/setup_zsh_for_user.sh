@@ -8,7 +8,7 @@ usage() {
 }
 
 # check args
-if [[ $# -lt 1 ]]; then
+if [[ $# -ne 1 ]]; then
     usage
 fi
 
@@ -33,11 +33,12 @@ if [[ ! -f "${INNER_SCRIPT}" ]]; then
     exit 1
 fi
 
-chmod +rx "${INNER_SCRIPT}"
+TARGET_ZSH="$(command -v zsh)"
+sudo -n -H -u "$TARGET_USER" -- bash -lc 'exec bash "$@"' \
+    setup_zsh_for_user "$INNER_SCRIPT" no-chsh
 
-CMD="${INNER_SCRIPT} no-chsh"
-sudo -iu "${TARGET_USER}" bash -lc "${CMD}"
-
-echo "[INFO] chsh to zsh for user ${TARGET_USER}"
-TARGET_ZSH=$(command -v zsh)
-sudo chsh -s "${TARGET_ZSH}" "${TARGET_USER}"
+CURRENT_SHELL="$(getent passwd "$TARGET_USER" | cut -d: -f7)"
+if [[ "$CURRENT_SHELL" != "$TARGET_ZSH" ]]; then
+    echo "[INFO] chsh to zsh for user $TARGET_USER"
+    chsh -s "$TARGET_ZSH" "$TARGET_USER"
+fi

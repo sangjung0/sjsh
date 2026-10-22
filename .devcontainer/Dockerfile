@@ -39,7 +39,6 @@ ENV CODEX_OFFICE_PYTHON=/opt/codex-office/bin/python
 # ADD USER AND SETUP ZSH
 ARG CONTAINER_USER
 ARG CONTAINER_UID
-ARG CONTAINER_HOME
 RUN ${SCRIPT_PATH}/root/add_user_and_setup_sudo.sh ${CONTAINER_USER} ${CONTAINER_UID}
 RUN ${SCRIPT_PATH}/root/setup_zsh_for_user.sh ${CONTAINER_USER}
 

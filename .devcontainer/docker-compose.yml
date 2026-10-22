@@ -13,7 +13,6 @@ services:
       args:
         CONTAINER_USER: ${CONTAINER_USER}
         CONTAINER_UID: ${CONTAINER_UID}
-        CONTAINER_HOME: ${CONTAINER_HOME}
     env_file:
       - ./.env
       - ../.env

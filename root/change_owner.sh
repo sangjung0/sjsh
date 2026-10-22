@@ -1,106 +1,115 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# usage
 usage() {
-    echo "Usage: $0 <username> [--target <path[:exclude1:exclude2:...]> ...]" >&2
+    echo "Usage: $0 <username> --target <path[:exclude1:exclude2:...]> [--target ...]" >&2
+    echo "Paths are relative to the working directory; ':' is a separator." >&2
     exit 1
 }
-
-# args: <username> [--target <path[:exclude1:exclude2:...]> ...]
-if [[ $# -lt 1 ]]; then
-    usage
-fi
-
-CONTAINER_USER="$1"
+[[ $# -ge 1 ]] || usage
+USER_NAME="$1"
 shift
-
-if ! id "$CONTAINER_USER" &>/dev/null; then
-    echo "Error: user '$CONTAINER_USER' does not exist." >&2
+if ! USER_ID="$(id -u "$USER_NAME")" || ! GROUP_ID="$(id -g "$USER_NAME")"; then
+    echo "[ERROR] User does not exist: $USER_NAME" >&2
     exit 1
 fi
+OWNER="$USER_ID:$GROUP_ID"
 
-if [[ "$CONTAINER_USER" == "root" ]]; then
-    echo "[INFO] root user detected → skipping ownership change"
-    exit 0
-fi
+# Resolve symlinks in parent directories, but preserve the final directory entry
+# so chown -h can change a symlink itself instead of its referent.
+normalize_entry() {
+    local path="$1" parent name
+    while [[ "$path" != / && "$path" == */ ]]; do
+        path="${path%/}"
+    done
+    IFS= read -r -d '' name < <(basename -z -- "$path") || return 1
+    if [[ "$name" == / || "$name" == . || "$name" == .. ]]; then
+        IFS= read -r -d '' REPLY < <(realpath -mz -- "$path") || return 1
+    else
+        IFS= read -r -d '' parent < <(dirname -z -- "$path") || return 1
+        IFS= read -r -d '' parent < <(realpath -mz -- "$parent") || return 1
+        REPLY="${parent%/}/$name"
+    fi
+}
 
-OWNER="${CONTAINER_USER}:${CONTAINER_USER}"
-
-declare -a TARGETS=()
-declare -A EXCLUDES
+declare -a TARGETS=() EXCLUSIONS=()
 
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --target)
-            [[ $# -lt 2 ]] && usage
-            arg="$2"
-            shift 2
-            tgt="${arg%%:*}"
-            exc="${arg#*:}"
-            TARGETS+=("$tgt")
-            [[ "$exc" == "$tgt" ]] && exc=""
-            EXCLUDES["$tgt"]="$exc"
-            ;;
-        *)
-            usage
-            ;;
-    esac
-done
+    [[ "$1" == --target && $# -ge 2 && -n "$2" ]] || usage
+    spec="$2"
+    shift 2
+    target="${spec%%:*}"
+    [[ -n "$target" ]] || usage
+    [[ -e "$target" || -L "$target" ]] || {
+        echo "[ERROR] Target does not exist: $target" >&2
+        exit 1
+    }
 
-build_prune_args() {
-    local target="$1"
-    local excludes_str="${EXCLUDES[$target]-}"
-
-    [[ -z "$excludes_str" ]] && return 0
-
-    local IFS=':'
-    local -a ex_arr
-    read -r -a ex_arr <<< "$excludes_str"
-    ((${#ex_arr[@]}==0)) && return 0
-
-    local -a out
-    out+=( \( )
-    local first=1
-    for e in "${ex_arr[@]}"; do
-        [[ -z "$e" ]] && continue
-        if (( first )); then
-            out+=( -path "$e" )
-            first=0
-        else
-            out+=( -o -path "$e" )
-        fi
-    done
-    out+=( \) -prune -o )
-
-    printf '%s\0' "${out[@]}"
-}
-
-chown_with_excludes() {
-    local target="$1" owner="$2"
-
-    local -a args
-    args+=( "$target" -mindepth 0 )
-
-    local -a prune=()
-    mapfile -d '' -t prune < <(build_prune_args "$target" || true)
-    (( ${#prune[@]} )) && args+=( "${prune[@]}" )
-
-    args+=( \( -not -user "$CONTAINER_USER" -o -not -group "$CONTAINER_USER" \) )
-
-    if (( EUID == 0 )); then
-        args+=( -exec chown "$owner" {} + )
-        find "${args[@]}" || true
+    normalize_entry "$target"
+    target="$REPLY"
+    TARGETS+=("$target")
+    if [[ "$spec" == *:* ]]; then
+        EXCLUSIONS+=("${spec#*:}")
     else
-        args+=( -exec sudo chown "$owner" {} + )
-        sudo find "${args[@]}" || true
+        EXCLUSIONS+=("")
     fi
+done
+(( ${#TARGETS[@]} > 0 )) || usage
 
+RUN=()
+if (( EUID != 0 )); then
+    sudo -n true
+    RUN=(sudo -n --)
+fi
+
+escape_pattern() {
+    REPLY="$1"
+    REPLY="${REPLY//\\/\\\\}"
+    REPLY="${REPLY//\*/\\*}"
+    REPLY="${REPLY//\?/\\?}"
+    REPLY="${REPLY//\[/\\[}"
+    REPLY="${REPLY//\]/\\]}"
 }
 
-
-for t in "${TARGETS[@]}"; do
-    [[ -e "$t" ]] && chown_with_excludes "$t" "$OWNER"
+status=0
+for index in "${!TARGETS[@]}"; do
+    target="${TARGETS[$index]}"
+    args=( -P "$target" )
+    exclusions=()
+    # Split only on colons, preserving literal newlines in paths.
+    remaining_exclusions="${EXCLUSIONS[$index]}"
+    while [[ "$remaining_exclusions" == *:* ]]; do
+        exclusions+=("${remaining_exclusions%%:*}")
+        remaining_exclusions="${remaining_exclusions#*:}"
+    done
+    exclusions+=("$remaining_exclusions")
+    prune=()
+    for excluded in "${exclusions[@]}"; do
+        [[ -n "$excluded" ]] || continue
+        normalize_entry "$excluded"
+        excluded="$REPLY"
+        escape_pattern "$excluded"
+        (( ${#prune[@]} == 0 )) || prune+=( -o )
+        prune+=( -path "$REPLY" )
+    done
+    if (( ${#prune[@]} > 0 )); then
+        args+=( \( "${prune[@]}" \) -prune -o )
+    fi
+    args+=( \( ! -uid "$USER_ID" -o ! -gid "$GROUP_ID" \) )
+    if ! "${RUN[@]}" find "${args[@]}" -exec chown -h -- "$OWNER" {} +; then
+        echo "[ERROR] Ownership change failed: $target" >&2
+        status=1
+        continue
+    fi
+    if ! remaining="$("${RUN[@]}" find "${args[@]}" -print -quit)"; then
+        echo "[ERROR] Cannot verify ownership: $target" >&2
+        status=1
+    elif [[ -n "$remaining" ]]; then
+        echo "[ERROR] Ownership is still different after chown: $remaining" >&2
+        echo "[ERROR] The filesystem may not support changing Unix ownership." >&2
+        status=1
+    else
+        echo "[OK] Ownership verified ($OWNER): $target"
+    fi
 done
-
-echo "[INFO] Ownership change completed."
+exit "$status"
