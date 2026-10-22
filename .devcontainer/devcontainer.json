@@ -1,0 +1,67 @@
+// Author: SangJeong Kim
+// Last Modified: 2026-08-14
+
+{
+  "name": "sjsh-dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "service",
+  "remoteUser": "root",
+  "workspaceFolder": "/workspaces/sjsh",
+  "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/post_create_command.sh",
+
+  // for linux container
+  // "initializeCommand": [
+  //  "${localWorkspaceFolder}/.devcontainer/initialize_command.sh",
+  //  "${localWorkspaceFolder}"
+  // ],
+
+  // for windows container
+  "initializeCommand": [
+    "${localWorkspaceFolder}\\.devcontainer\\initialize_command.cmd",
+    "${localWorkspaceFolder}"
+  ],
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Copilot
+        "github.copilot",
+        // Codex
+        "openai.chatgpt",
+
+        // 기타 포매터
+        // Prettier 포매터 (JS/TS/JSON/Markdown/TOML 등).
+        "esbenp.prettier-vscode",
+        // shfmt 기반 Shell/Dockerfile 포매터.
+        "foxundermoon.shell-format",
+        // .editorconfig 규칙 자동 적용/해석.
+        "editorconfig.editorconfig",
+        // yaml support & formatter
+        "redhat.vscode-yaml",
+        // .env & dotenv support
+        "dotenv.dotenv-vscode",
+        // 기타 포매터 -- end
+
+        // Azure CLI 명령어 지원. 명령어 자동완성·하이라이트 등 제공.
+        "ms-vscode.azurecli",
+        // Code Runner. Python/Zsh 등 단일 파일 빠른 실행.
+        "formulahendry.code-runner",
+        // 맞춤법/오타 검사기(cSpell). 단어 하이라이트 + 사용자 사전 지원.
+        "streetsidesoftware.code-spell-checker",
+        // CSS/JS/TS 등에서 색상(hex/rgb 등) 하이라이트.
+        "naumovs.color-highlight",
+        // 들여쓰기 색깔로 보여주는 Rainbow indent.
+        "oderwat.indent-rainbow",
+        // 파일 경로 자동완성 개선. 상대/절대 경로 탐색 향상.
+        "ionutvmi.path-autocomplete",
+        // T_ODO/FIXME 트리뷰 제공. 프로젝트 전체 TODO를 한눈에 관리.
+        "gruntfuggly.todo-tree",
+        // 과거 특정 시기의 파일과 직접 비교
+        "letmaik.git-tree-compare"
+      ]
+    }
+  }
+}

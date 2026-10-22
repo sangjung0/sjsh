@@ -1,0 +1,21 @@
+# Local environment
+.env
+.env.*
+!.env.example
+# Local files
+.DS_Store
+Thumbs.db
+.idea/
+*.log
+# Generated output
+build/
+dist/
+# Personal playbook and agent workspaces
+.agents/
+.agent-state/
+.agent-workspace/
+AGENTS.md
+# Downloaded setup scripts
+.devcontainer/sjsh/
+# Personal scratch files
+**__dis__**

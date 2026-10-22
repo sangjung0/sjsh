@@ -1,18 +1,38 @@
 // Author: SangJeong Kim
-// Last Modified: 2026-03-31
+// Last Modified: 2026-08-14
 
 {
-  "editor.wordWrap": "on",
-  "editor.wrappingIndent": "indent",
+  "code-runner.runInTerminal": true,
+  "code-runner.executorMap": {},
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
   "search.exclude": {
     "**/.git": true,
-    "**/.vscode": true
+    "**/.vscode": true,
+    "**/output": true,
+    "**/log": true,
+    ".shortcuts/**": true
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    ".shortcuts/**": true
   },
+  // :TODOS:Tree
+  "todo-tree.ripgrep.ripgrep": "/usr/bin/rg",
+  "todo-tree.filtering.excludeGlobs": [
+    "**/.git/*/**",
+    "**/.vscode/*/**"
+  ],
   // Editor
+  "editor.wordWrap": "on",
+  "editor.wrappingIndent": "indent",
   "editor.fontFamily": "JetBrains Mono, D2Coding",
   "editor.fontLigatures": true,
   "editor.fontSize": 18,
@@ -31,8 +51,24 @@
     "editor.insertSpaces": true,
     "files.trimTrailingWhitespace": false
   },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[env]": {
+    "editor.defaultFormatter": "dotenv.dotenv-vscode"
+  },
+  "files.associations": {
+    ".env": "env",
+    ".env.*": "env"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -40,5 +76,5 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["venv"]
+  "cSpell.words": []
 }
