@@ -1,5 +1,5 @@
 REM Author: SangJeong Kim
-REM Last Modified: 2026-08-03
+REM Last Modified: 2026-10-22
 
 @echo off
 setlocal
@@ -13,7 +13,7 @@ if "%~1"=="" (
 set "CONTAINER_WORK_DIR=%~1"
 
 if not exist "%CONTAINER_WORK_DIR%\.devcontainer\sjsh" (
-    git clone --branch v0.0.7 https://github.com/sangjung0/sjsh.git ^
+    git clone --branch v0.0.8 https://github.com/sangjung0/sjsh.git ^
         "%CONTAINER_WORK_DIR%\.devcontainer\sjsh"
     if errorlevel 1 exit /b 1
 )
